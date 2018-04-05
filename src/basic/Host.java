@@ -15,6 +15,8 @@ public class Host {
 	ArrayList<String> neighbors;
 	// the list of pair names
 	ArrayList<String> pairs;
+	// the host name and ip
+	HashMap<String, String> neimap;
 	// the coordinate of each neighbor
 	HashMap<String, double[]> neicor;
 	//the measured RTT between each pair, the index is formatted as "s1-m2"
@@ -60,20 +62,31 @@ public class Host {
 	}
 	// initialize the neighbor list and remove the name of the current host, and initialize the coordinate of neighbors 
 	public void iniNeigh(){
-		ArrayList<String> nei = new ArrayList<>();
-		nei.add("s1");
-		nei.add("s2");
-		nei.add("s3");
-		nei.add("m1");
-		nei.add("m2");
-		nei.add("m3");
-		nei.add("l1");
-		nei.add("l2");
-		nei.add("l3");
-		nei.remove(name);
-		neighbors = nei;
+		neighbors = new ArrayList<>();
+		neimap = new HashMap<>();
+		neicor = new HashMap<>();
+		neighbors.add("s1");
+		neighbors.add("s2");
+		neighbors.add("s3");
+		neighbors.add("m1");
+		neighbors.add("m2");
+		neighbors.add("m3");
+		neighbors.add("l1");
+		neighbors.add("l2");
+		neighbors.add("l3");
+		neimap.put("s1", "115.146.85.0");
+		neimap.put("s2", "115.146.86.26");
+		neimap.put("s3", "115.146.86.56");
+		neimap.put("m1", "115.146.85.26");
+		neimap.put("m2", "115.146.85.103");
+		neimap.put("m3", "144.6.226.0");
+		neimap.put("l1", "115.146.86.181");
+		neimap.put("l2", "144.6.226.60");
+		neimap.put("l3", "43.240.97.36");
+		neighbors.remove(name);
+		neimap.remove(name);
 		double[] cor = {0,0};
-		for(String s: nei){
+		for(String s: neighbors){
 			neicor.put(s, cor);
 		}
 		
@@ -93,7 +106,8 @@ public class Host {
 //	 */
 	public void iniMaps(ArrayList<String> pairs){	
 		for(String s: pairs){
-			rtt.put(s, 0.0);
+			// use as the test version
+			rtt.put(s, 3.0);
 			pre.put(s, 0.0);
 			err.put(s, 0.0);
 			remoteerr.put(s, 0.0);
@@ -101,11 +115,16 @@ public class Host {
 		}
 	}
 	
-	
+
 	public Coordinate vivaldi(String remotenam, double rtt, Coordinate remotecor, double remoteerr){
 		Coordinate exit = coor;
 		double x,y =0;
-		double distance = disCor(exit, remotecor);
+		double distance;
+		if(Coordinate.equalCoor(exit, remotecor))
+			distance = 0;
+		else
+			distance = disCor(exit, remotecor);
+		
 		double localerr = Math.abs(rtt-distance);
 		err.put(remotenam, localerr); 
 		w = localerr/(localerr+remoteerr);
@@ -113,9 +132,20 @@ public class Host {
 		double relatederr = Math.abs(distance-rtt)/rtt;
 		localerr = relatederr * ce * w + localerr * (1-ce * w);
 		ita = c * w;
-		double dir = Math.abs((remotecor.getCoorY()-exit.getCoorY())/(remotecor.getCoorX()-exit.getCoorX()));
-		if(rtt == distance)
+		
+		double dir = 0;
+		if(distance != 0)
+			dir = Math.abs((remotecor.getCoorY()-exit.getCoorY())/(remotecor.getCoorX()-exit.getCoorX()));
+		 
+		if (distance == 0){
+				x = Math.random();
+				y = Math.random();
+		}
+		// achieve the optimal solution
+		 else if(rtt == distance)
 			return exit;
+		
+		// two nodes not at the same position
 		else{
 			if(exit.getCoorX()<remotecor.getCoorX())
 				x = exit.getCoorX() - ita*(rtt-distance)*dir;
@@ -125,12 +155,13 @@ public class Host {
 				y = exit.getCoorY() - ita*(rtt-distance)*dir;
 			else
 				y = exit.getCoorY() + ita*(rtt-distance)*dir;
-			
+		}
+		
 			DecimalFormat formatter  = new DecimalFormat("#0.00");
 			x = Double.valueOf(formatter.format(x));
 			y = Double.valueOf(formatter.format(y));
 			exit.setCoor(x, y);
-		}
+		
 		
 		return exit;
 	}
@@ -175,6 +206,12 @@ public class Host {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	public HashMap<String, String> getNeimap() {
+		return neimap;
+	}
+	public void setNeimap(HashMap<String, String> neimap) {
+		this.neimap = neimap;
 	}
 	
 	

@@ -13,6 +13,7 @@ public class HostInfo {
 		this.err = err;
 	}
 
+	
 	public String getName() {
 		return name;
 	}

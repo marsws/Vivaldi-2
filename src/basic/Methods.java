@@ -17,8 +17,8 @@ public class Methods {
 	 
 	 public static void writeFile(String sen, String file){
 			try {
-//				String path = "/home/ubuntu/Records.txt";
-				String path = "/Users/yidwa/Desktop/CoordinateRecords_" + file +".txt";
+				String path = "/home/ubuntu/CoordinateRecords_" + file +".txt";
+//				String path = "/Users/yidwa/Desktop/CoordinateRecords_" + file +".txt";
 //				String path = "/home/ubuntu/TopologyResult.txt";
 				File f = new File(path);
 				FileWriter fw = new FileWriter(f,true);

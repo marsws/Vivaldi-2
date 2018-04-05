@@ -27,10 +27,18 @@ public class Coordinate {
 		return coor;
 	}
 
+	public static boolean equalCoor(Coordinate a, Coordinate b){
+		boolean e = false;
+		if(a.getCoorX() == b.getCoorX() && a.getCoorY() == b.getCoorY())
+			e = true;
+		return e;
+	}
+	
 	@Override
 	public String toString() {
 		return x + "," + y;
 	}
+	
 	
 	
 }
