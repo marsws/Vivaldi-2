@@ -1,4 +1,5 @@
 package basic;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -42,10 +43,11 @@ public class Host {
 	// the dynamic interval to control the oscillation and convergence rate
 	double interval;
 	
-	public Host(String name, double x, double y, int avail) {
+
+	public Host(String name, Coordinate c, int avail) {
 		// TODO Auto-generated constructor stub
 		this.name = name;
-		this.coor = new Coordinate(x, y);
+		this.coor = c;
 		this.availability = avail;
 		this.w = 0.0;
 		rtt = new HashMap<>();
@@ -53,8 +55,9 @@ public class Host {
 		err = new HashMap<>();
 		remoteerr = new HashMap<>();
 		reerr = new HashMap<>();
+		iniNeigh();
+		iniPair();
 	}
-
 	// initialize the neighbor list and remove the name of the current host, and initialize the coordinate of neighbors 
 	public void iniNeigh(){
 		ArrayList<String> nei = new ArrayList<>();
@@ -75,20 +78,20 @@ public class Host {
 		}
 		
 	}
-	// initialize the pair name
+//	// initialize the pair name
 	public void iniPair(){
 		ArrayList<String> pariname = new ArrayList<>();
 		for(String s: neighbors){
 			pariname.add(name+"-"+s);
 		}
+		iniMaps(pariname);
 	}
-	
-	/**
-	 * based on the list of pair name, initialize all the maps for later use
-	 * @param pairs
-	 */
-	public void iniMaps(ArrayList<String> pairs){
-		
+//	
+//	/**
+//	 * based on the list of pair name, initialize all the maps for later use
+//	 * @param pairs
+//	 */
+	public void iniMaps(ArrayList<String> pairs){	
 		for(String s: pairs){
 			rtt.put(s, 0.0);
 			pre.put(s, 0.0);
@@ -99,10 +102,10 @@ public class Host {
 	}
 	
 	
-	public Coordinate vivaldi(String remotenam, double rtt, Coordinate other, double remoteerr){
+	public Coordinate vivaldi(String remotenam, double rtt, Coordinate remotecor, double remoteerr){
 		Coordinate exit = coor;
 		double x,y =0;
-		double distance = disCor(exit, other);
+		double distance = disCor(exit, remotecor);
 		double localerr = Math.abs(rtt-distance);
 		err.put(remotenam, localerr); 
 		w = localerr/(localerr+remoteerr);
@@ -110,19 +113,22 @@ public class Host {
 		double relatederr = Math.abs(distance-rtt)/rtt;
 		localerr = relatederr * ce * w + localerr * (1-ce * w);
 		ita = c * w;
-		double dir = Math.abs((other.getCoorY()-exit.getCoorY())/(other.getCoorX()-exit.getCoorX()));
+		double dir = Math.abs((remotecor.getCoorY()-exit.getCoorY())/(remotecor.getCoorX()-exit.getCoorX()));
 		if(rtt == distance)
 			return exit;
 		else{
-			if(exit.getCoorX()<other.getCoorX())
+			if(exit.getCoorX()<remotecor.getCoorX())
 				x = exit.getCoorX() - ita*(rtt-distance)*dir;
 			else
 				x =  exit.getCoorX() + ita*(rtt-distance)*dir;
-			if(exit.getCoorY()<other.getCoorY())
+			if(exit.getCoorY()<remotecor.getCoorY())
 				y = exit.getCoorY() - ita*(rtt-distance)*dir;
 			else
 				y = exit.getCoorY() + ita*(rtt-distance)*dir;
 			
+			DecimalFormat formatter  = new DecimalFormat("#0.00");
+			x = Double.valueOf(formatter.format(x));
+			y = Double.valueOf(formatter.format(y));
 			exit.setCoor(x, y);
 		}
 		
@@ -136,29 +142,7 @@ public class Host {
 		return result;
 	}
 	
-	public static void main(String[] args) {
-		int count = 0;
-		Host a = new Host("s1", 0, 0, 0);
-		Coordinate blocation = new Coordinate(3, 4);
-		double latency = 10.0;
-		double diff =100;
-		double iniremoteerr = 5.0;
-		while(diff!=0){
-			count++;
-			Coordinate result = a.vivaldi("s2", latency, blocation, iniremoteerr);
-			System.out.println("the host a coordinate update to"+ result.getCoorX()+" , "+result.getCoorY());
-			diff = latency - a.disCor(result, blocation);
-			System.out.println("diff now is "+diff);
-			if(diff!=0){
-				Host b = new Host("s2", blocation.getCoorX(), blocation.getCoorY(), 0);
-				Coordinate bupdate = b.vivaldi("s1", latency, result, a.err.get("s2"));
-				iniremoteerr = b.err.get("s1");
-				System.out.println("the host b coordinate update to "+bupdate.getCoorX()+" , "+bupdate.getCoorY());
-				diff = latency - b.disCor(bupdate, result);				
-			}
-		}
-		System.out.println("counting "+count);
-	}
+
 	public Coordinate getCoor() {
 		return coor;
 	}
@@ -174,6 +158,25 @@ public class Host {
 	public void setAvailability(int availability) {
 		this.availability = availability;
 	}
+	public HashMap<String, Double> getRtt() {
+		return rtt;
+	}
+	public void setRtt(HashMap<String, Double> rtt) {
+		this.rtt = rtt;
+	}
+	public HashMap<String, Double> getErr() {
+		return err;
+	}
+	public void setErr(HashMap<String, Double> err) {
+		this.err = err;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	
 	
 	

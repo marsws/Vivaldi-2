@@ -26,4 +26,11 @@ public class Coordinate {
 	public double[] getCoor(){
 		return coor;
 	}
+
+	@Override
+	public String toString() {
+		return x + "," + y;
+	}
+	
+	
 }
