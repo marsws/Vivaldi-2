@@ -14,7 +14,7 @@ public class Host {
 	// the list of neighbors
 	ArrayList<String> neighbors;
 	// the list of pair names
-	ArrayList<String> pairs;
+//	ArrayList<String> pairs;
 	// the host name and ip
 	HashMap<String, String> neimap;
 	// the coordinate of each neighbor
@@ -58,7 +58,7 @@ public class Host {
 		remoteerr = new HashMap<>();
 		reerr = new HashMap<>();
 		iniNeigh();
-		iniPair();
+		iniMaps(neighbors);
 	}
 	// initialize the neighbor list and remove the name of the current host, and initialize the coordinate of neighbors 
 	public void iniNeigh(){
@@ -92,20 +92,20 @@ public class Host {
 		
 	}
 //	// initialize the pair name
-	public void iniPair(){
-		ArrayList<String> pariname = new ArrayList<>();
-		for(String s: neighbors){
-			pariname.add(name+"-"+s);
-		}
-		iniMaps(pariname);
-	}
+//	public void iniPair(){
+//		ArrayList<String> pariname = new ArrayList<>();
+//		for(String s: neighbors){
+//			pariname.add(name+"-"+s);
+//		}
+//		iniMaps(pariname);
+//	}
 //	
 //	/**
 //	 * based on the list of pair name, initialize all the maps for later use
 //	 * @param pairs
 //	 */
-	public void iniMaps(ArrayList<String> pairs){	
-		for(String s: pairs){
+	public void iniMaps(ArrayList<String> neighbors){	
+		for(String s: neighbors){
 			// use as the test version
 			rtt.put(s, 3.0);
 			pre.put(s, 0.0);
@@ -117,13 +117,14 @@ public class Host {
 	
 
 	public Coordinate vivaldi(String remotenam, double rtt, Coordinate remotecor, double remoteerr){
-		Coordinate exit = coor;
+		
+		Coordinate old = coor;
 		double x,y =0;
 		double distance;
-		if(Coordinate.equalCoor(exit, remotecor))
+		if(Coordinate.equalCoor(old, remotecor))
 			distance = 0;
 		else
-			distance = disCor(exit, remotecor);
+			distance = disCor(old, remotecor);
 		
 		double localerr = Math.abs(rtt-distance);
 		err.put(remotenam, localerr); 
@@ -135,35 +136,44 @@ public class Host {
 		
 		double dir = 0;
 		if(distance != 0)
-			dir = Math.abs((remotecor.getCoorY()-exit.getCoorY())/(remotecor.getCoorX()-exit.getCoorX()));
+			dir = Math.abs((remotecor.getCoorY()-old.getCoorY())/(remotecor.getCoorX()-old.getCoorX()));
 		 
 		if (distance == 0){
 				x = Math.random();
 				y = Math.random();
+				System.out.println("starting at the same point, then choose random coordinates "+x+" , "+y);
 		}
 		// achieve the optimal solution
-		 else if(rtt == distance)
-			return exit;
+		 else if(rtt == distance){
+			System.out.println("no more change needed at this stage");
+			return old;
+		 }
 		
 		// two nodes not at the same position
 		else{
-			if(exit.getCoorX()<remotecor.getCoorX())
-				x = exit.getCoorX() - ita*(rtt-distance)*dir;
+			if(old.getCoorX()<remotecor.getCoorX())
+				x = old.getCoorX() - ita*(rtt-distance)*dir;
 			else
-				x =  exit.getCoorX() + ita*(rtt-distance)*dir;
-			if(exit.getCoorY()<remotecor.getCoorY())
-				y = exit.getCoorY() - ita*(rtt-distance)*dir;
+				x =  old.getCoorX() + ita*(rtt-distance)*dir;
+			if(old.getCoorY()<remotecor.getCoorY())
+				y = old.getCoorY() - ita*(rtt-distance)*dir;
 			else
-				y = exit.getCoorY() + ita*(rtt-distance)*dir;
+				y = old.getCoorY() + ita*(rtt-distance)*dir;
 		}
 		
 			DecimalFormat formatter  = new DecimalFormat("#0.00");
 			x = Double.valueOf(formatter.format(x));
 			y = Double.valueOf(formatter.format(y));
-			exit.setCoor(x, y);
+			err.put(remotenam, Double.valueOf(formatter.format(localerr))); 
 		
-		
-		return exit;
+			String info = name+" , from "+ old.toString()+ " to  ["+ x+" , "+y+" ] "+"\n";
+			System.out.println("changed "+info+" with rtt is "+ rtt +" , distance is "+distance+" , err is "+ localerr);
+			Methods.writeFile(info, name);
+			old.setCoor(x, y);
+			setCoor(old);
+			
+			
+		return old;
 	}
 	
 	

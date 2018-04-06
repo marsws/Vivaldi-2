@@ -20,7 +20,6 @@ public class Server implements Runnable{
 			try {
 				this.local = local;
 				ss = new ServerSocket(Constants.serverport);
-				System.out.println("server started");
 			}
 			 catch (BindException e) {
 
@@ -38,6 +37,7 @@ public class Server implements Runnable{
 				try {
 					s = ss.accept();
 					System.out.println("server received request from "+s.getInetAddress());
+
 					new Thread(new ServerThread(s, local)).start();
 					
 

@@ -9,7 +9,7 @@ import basic.Host;
 
 public class Starting {
 	public static Timer timer;
-	public static Thread infosending;
+	public static TimerTask infosending;
 	public static Thread serverthread;
 	public static Thread updatingthread;
 
@@ -30,23 +30,20 @@ public class Starting {
 	
 		Host local = new Host(localname, acor, avail);
 		
-		
-		int counter = 5;
-		
 	
 		// starting the server thread to wait request for info 
 		serverthread = new Thread(new Server(local));
-
-		while(counter >0){
-			
-			TimeUnit.MILLISECONDS.sleep(5000);
-
-			System.out.println("should start new sending ");
-			infosending = new Thread(new InfoSending(local));
-
-			counter --;
-		}
-
+		
+		serverthread.start();
+		
+		
+		TimeUnit.MILLISECONDS.sleep(1000);
+		
+		infosending = new InfoSending(local);
+		
+		Timer timer = new Timer();
+		
+		timer.schedule(infosending, 1000, 20000);
 
 	}
 

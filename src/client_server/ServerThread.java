@@ -56,19 +56,31 @@ public class ServerThread implements Runnable {
 			oos = new ObjectOutputStream(s.getOutputStream());
 
 			ni = ois.readObject();
+			
+			double rtt = 0;
+			double err = 0;
+			
 
-			while (ni != null) {
+			if (ni != null) {
 
 				HostInfo hi = (HostInfo) ni;
-				
-				Coordinate updatecor = local.vivaldi(hi.name, local.getRtt().get(hi.name) , hi.coor, local.getErr().get(hi.name));
+				if(local.getRtt().containsKey(hi.name)){
+						rtt = local.getRtt().get(hi.name);
+						System.out.println("the rtt for "+hi.name +" is "+rtt);
+				}
+				Coordinate remotecor = hi.coor;
+				if(local.getErr().containsKey(hi.name))
+					err = local.getErr().get(hi.name);
+				Coordinate updatecor = local.vivaldi(hi.name, rtt, remotecor, err);
 				
 				//write the updated info back
 				oos.writeObject(new HostInfo(local.getName(), updatecor, local.getErr().get(hi.name)));
 				oos.flush();
-				
-
+			
 			}
+			else
+				System.out.println("receiving null object");
+			
 			ois.close();
 			oos.close();
 

@@ -1,7 +1,13 @@
 package basic;
 
+import java.io.Serializable;
+
 //maintain the basic info of a host and regarded as the transmission unit
-public class HostInfo {
+public class HostInfo implements Serializable  {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public String name;
 	public Coordinate coor;
 	public Double err;

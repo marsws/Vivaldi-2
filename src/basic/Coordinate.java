@@ -1,6 +1,8 @@
 package basic;
 
-public class Coordinate {
+import java.io.Serializable;
+
+public class Coordinate  implements Serializable {
 	double x;
 	double y;
 	double[] coor;
@@ -36,7 +38,7 @@ public class Coordinate {
 	
 	@Override
 	public String toString() {
-		return x + "," + y;
+		return "[ "+x + "," + y+" ]";
 	}
 	
 	
