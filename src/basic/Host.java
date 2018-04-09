@@ -184,13 +184,27 @@ public class Host {
 	}
 	
 	
-	public double disCor(Coordinate i, Coordinate j){
+	public static double  disCor(Coordinate i, Coordinate j){
 		
 		double result = Math.sqrt(Math.pow(Math.abs(i.getCoorX()-j.getCoorX()), 2)+Math.pow(Math.abs(i.getCoorY()-j.getCoorY()), 2));
 		return result;
 	}
 	
 
+//	/**
+//	 * testing for the distance
+//	 * @param args
+//	 */
+//	public static void main(String[] args) {
+//		Coordinate s1 = new Coordinate(0.417, 0.825);
+//		Coordinate s2 = new Coordinate(0.31, 0.544);
+//		Coordinate s3 = new Coordinate(0.653, 0.673);
+//		System.out.println("s1-s2 "+disCor(s1, s2)+" , s2-s3"+disCor(s2, s3) + " , s1-s3 "+disCor(s1, s3));
+//	}
+	
+	
+	
+	
 	public Coordinate getCoor() {
 		return coor;
 	}
