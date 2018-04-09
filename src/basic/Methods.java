@@ -15,13 +15,13 @@ public class Methods {
 			return output;
 		}
 	 
-	 public static void writeFile(String sen, String file){
+	 public static void writeFile(String sen, String file, boolean appendFile){
 			try {
-				String path = "/home/ubuntu/CoordinateRecords_" + file +".txt";
+				String path = "/home/ubuntu/" + file +".txt";
 //				String path = "/Users/yidwa/Desktop/CoordinateRecords_" + file +".txt";
 //				String path = "/home/ubuntu/TopologyResult.txt";
 				File f = new File(path);
-				FileWriter fw = new FileWriter(f,true);
+				FileWriter fw = new FileWriter(f,appendFile);
 				String time = Methods.formattime();
 				fw.write(time+"\n"+ sen+"\n");
 			

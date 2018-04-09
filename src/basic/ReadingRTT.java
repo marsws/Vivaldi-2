@@ -18,8 +18,12 @@ public class ReadingRTT {
 			while (line != null) {
 				if(line.contains(",")){
 					String[] info = line.split(",");
-					String name = info[0];
-					double updatertt = Double.valueOf(info[1]);
+					String name = "";
+					double updatertt =0;
+					if(info.length>1){
+					  name = info[0];
+					  updatertt = Double.valueOf(info[1]);
+					}
 					rtt.put(name, updatertt);
 					System.out.println("update rtt for "+name + " with "+updatertt);
 				}

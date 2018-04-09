@@ -69,6 +69,7 @@ public class ServerThread implements Runnable {
 						System.out.println("the rtt for "+hi.name +" is "+rtt);
 				}
 				Coordinate remotecor = hi.coor;
+				local.getNeicor().put(hi.name, remotecor);
 				if(local.getErr().containsKey(hi.name))
 					err = local.getErr().get(hi.name);
 				Coordinate updatecor = local.vivaldi(hi.name, rtt, remotecor, err);

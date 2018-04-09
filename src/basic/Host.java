@@ -17,8 +17,8 @@ public class Host {
 //	ArrayList<String> pairs;
 	// the host name and ip
 	HashMap<String, String> neimap;
-	// the coordinate of each neighbor
-	HashMap<String, double[]> neicor;
+	// the coordinate of each neighbor, this contains the coordinate of the node itself
+	HashMap<String, Coordinate> neicor;
 	//the measured RTT between each pair, the index is formatted as "s1-m2"
 	HashMap<String, Double> rtt;
 	//the predicated rtt based on the coordinates
@@ -83,12 +83,13 @@ public class Host {
 		neimap.put("l1", "115.146.86.181");
 		neimap.put("l2", "144.6.226.60");
 		neimap.put("l3", "43.240.97.36");
-		neighbors.remove(name);
-		neimap.remove(name);
-		double[] cor = {0,0};
+		Coordinate cor = new Coordinate(0, 0);
 		for(String s: neighbors){
 			neicor.put(s, cor);
 		}
+		neighbors.remove(name);
+		neimap.remove(name);
+		
 		
 	}
 //	// initialize the pair name
@@ -151,6 +152,8 @@ public class Host {
 		
 		// two nodes not at the same position
 		else{
+//			System.out.println("local cor is "+old.getCoorX()+" ,"+old.getCoorY()+" , remote one is "+remotecor.toString());
+//			System.out.println("need further change: rtt "+rtt+" , distance "+distance+" , dir "+ dir);
 			if(old.getCoorX()<remotecor.getCoorX())
 				x = old.getCoorX() - ita*(rtt-distance)*dir;
 			else
@@ -159,19 +162,23 @@ public class Host {
 				y = old.getCoorY() - ita*(rtt-distance)*dir;
 			else
 				y = old.getCoorY() + ita*(rtt-distance)*dir;
+			
+//			System.out.println("changed coordinate X from "+old.getCoorX()+" to "+x+ "; changed y from "+old.getCoorY() +" to "
+//					+ y);
 		}
 		
-			DecimalFormat formatter  = new DecimalFormat("#0.00");
+			DecimalFormat formatter  = new DecimalFormat("#0.000");
 			x = Double.valueOf(formatter.format(x));
 			y = Double.valueOf(formatter.format(y));
 			err.put(remotenam, Double.valueOf(formatter.format(localerr))); 
 		
-			String info = name+" , from "+ old.toString()+ " to  ["+ x+" , "+y+" ] "+"\n";
-			System.out.println("changed "+info+" with rtt is "+ rtt +" , distance is "+distance+" , err is "+ localerr);
-			Methods.writeFile(info, name);
+			String info = name+" , from "+ old.getCoorX()+" , "+old.getCoorY()+ " to  ["+ x+" , "+y+" ] "+"\n";
+			System.out.println(info+" with rtt is "+ rtt +" , distance is "+distance+" , err is "+ localerr);
+			Methods.writeFile(info, "logs/"+name, true);
 			old.setCoor(x, y);
 			setCoor(old);
-			
+			//update the latest local coordinate into the neicor
+			neicor.put(name, old);
 			
 		return old;
 	}
@@ -222,6 +229,18 @@ public class Host {
 	}
 	public void setNeimap(HashMap<String, String> neimap) {
 		this.neimap = neimap;
+	}
+	public ArrayList<String> getNeighbors() {
+		return neighbors;
+	}
+	public void setNeighbors(ArrayList<String> neighbors) {
+		this.neighbors = neighbors;
+	}
+	public HashMap<String, Coordinate> getNeicor() {
+		return neicor;
+	}
+	public void setNeicor(HashMap<String, Coordinate> neicor) {
+		this.neicor = neicor;
 	}
 	
 	

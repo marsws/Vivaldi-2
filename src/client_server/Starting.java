@@ -10,6 +10,7 @@ import basic.Host;
 public class Starting {
 	public static Timer timer;
 	public static TimerTask infosending;
+	public static TimerTask coordinateupdate;
 	public static Thread serverthread;
 	public static Thread updatingthread;
 
@@ -40,11 +41,14 @@ public class Starting {
 		TimeUnit.MILLISECONDS.sleep(1000);
 		
 		infosending = new InfoSending(local);
+		coordinateupdate = new CoordinateRecording(local);
 		
 		Timer timer = new Timer();
 		
 		timer.schedule(infosending, 1000, 20000);
-
+		timer.schedule(coordinateupdate, 2000, 30000);
+		
+		
 	}
 
 }
