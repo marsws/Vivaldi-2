@@ -5,16 +5,18 @@ import java.io.Serializable;
 public class Coordinate  implements Serializable {
 	double x;
 	double y;
+	double z;
 	double[] coor;
-	public Coordinate(double x, double y) {
+	public Coordinate(double x, double y, double z) {
 		// TODO Auto-generated constructor stub
-		setCoor(x, y);
-		this.coor = new double[]{x,y};
+		setCoor(x, y, z);
+		this.coor = new double[]{x,y,z};
 	}
 	
-	public void setCoor(double x, double y){
+	public void setCoor(double x, double y, double z){
 		this.x = x;
 		this.y = y;
+		this.z = z;
 	}
 	
 	public double getCoorX(){
@@ -25,9 +27,18 @@ public class Coordinate  implements Serializable {
 		return y;
 	}
 	
+	public double getZ() {
+		return z;
+	}
+
+	public void setZ(double z) {
+		this.z = z;
+	}
+
 	public double[] getCoor(){
 		return coor;
 	}
+	
 
 	public static boolean equalCoor(Coordinate a, Coordinate b){
 		boolean e = false;
@@ -38,7 +49,7 @@ public class Coordinate  implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "[ "+x + "," + y+" ]";
+		return "[ "+x + "," + y+ ","+ z+" ]";
 	}
 	
 	

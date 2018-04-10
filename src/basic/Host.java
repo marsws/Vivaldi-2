@@ -1,4 +1,9 @@
 package basic;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +15,7 @@ public class Host {
 	// host name
 	String name;
 	// the available No. of CPU cores
-	int availability;
+	double availability;
 	// the list of neighbors
 	ArrayList<String> neighbors;
 	// the list of pair names
@@ -46,11 +51,10 @@ public class Host {
 	double interval;
 	
 
-	public Host(String name, Coordinate c, int avail) {
+	public Host(String name, Coordinate c) {
 		// TODO Auto-generated constructor stub
 		this.name = name;
 		this.coor = c;
-		this.availability = avail;
 		this.w = 0.0;
 		rtt = new HashMap<>();
 		pre = new HashMap<>();
@@ -59,6 +63,39 @@ public class Host {
 		reerr = new HashMap<>();
 		iniNeigh();
 		iniMaps(neighbors);
+	}
+	
+	
+	public double availRetrieve(){
+		String[] temp;
+		FileReader fr;
+		double avail = 0.0;
+		// read the cpu idle percentage for each host as the z axis, and the z is the sum of idle for all cores
+		try {
+			fr = new FileReader(new File("/home/ubuntu/CPU"));
+			BufferedReader br = new BufferedReader(fr);
+			String latest="";
+			String line="";
+			while((line = br.readLine()) != null) {
+				latest = line;
+			}
+			temp = latest.split(" ");
+			int size = temp.length;
+			double r = 0;
+			for(int i = 6; i<size; i=i+2){
+				r+=Double.valueOf(temp[i]);
+			}
+			avail = r*1.0/100;
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.println("no such file found");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("something wronge when reading the file");
+		}
+		
+		return avail;
+//		System.out.println(avail);
 	}
 	// initialize the neighbor list and remove the name of the current host, and initialize the coordinate of neighbors 
 	public void iniNeigh(){
@@ -83,7 +120,7 @@ public class Host {
 		neimap.put("l1", "115.146.86.181");
 		neimap.put("l2", "144.6.226.60");
 		neimap.put("l3", "43.240.97.36");
-		Coordinate cor = new Coordinate(0, 0);
+		Coordinate cor = new Coordinate(0, 0, 0);
 		for(String s: neighbors){
 			neicor.put(s, cor);
 		}
@@ -108,7 +145,7 @@ public class Host {
 	public void iniMaps(ArrayList<String> neighbors){	
 		for(String s: neighbors){
 			// use as the test version
-			rtt.put(s, 3.0);
+			rtt.put(s, 0.0);
 			pre.put(s, 0.0);
 			err.put(s, 0.0);
 			remoteerr.put(s, 0.0);
@@ -120,7 +157,7 @@ public class Host {
 	public Coordinate vivaldi(String remotenam, double rtt, Coordinate remotecor, double remoteerr){
 		
 		Coordinate old = coor;
-		double x,y =0;
+		double x,y,z =0;
 		double distance;
 		if(Coordinate.equalCoor(old, remotecor))
 			distance = 0;
@@ -166,16 +203,17 @@ public class Host {
 //			System.out.println("changed coordinate X from "+old.getCoorX()+" to "+x+ "; changed y from "+old.getCoorY() +" to "
 //					+ y);
 		}
-		
+			
 			DecimalFormat formatter  = new DecimalFormat("#0.000");
 			x = Double.valueOf(formatter.format(x));
 			y = Double.valueOf(formatter.format(y));
 			err.put(remotenam, Double.valueOf(formatter.format(localerr))); 
-		
-			String info = name+" , from "+ old.getCoorX()+" , "+old.getCoorY()+ " to  ["+ x+" , "+y+" ] "+"\n";
-			System.out.println(info+" with rtt is "+ rtt +" , distance is "+distance+" , err is "+ localerr);
-			Methods.writeFile(info, "logs/"+name, true);
-			old.setCoor(x, y);
+			z = Double.valueOf(formatter.format(availRetrieve()));
+//			System.out.println("the z is retrived as "+z);
+			String info = name+" , from "+ old.getCoorX()+" , "+old.getCoorY()+  old.getZ()+" to  ["+ x+" , "+y+", "+ z +" ] "+"\n";
+			System.out.println(info+" with "+ remotenam+" has the rtt with "+ rtt +" , distance is "+distance+" , err is "+ localerr);
+			Methods.writeFile(info, "logs/"+name, true, true);
+			old.setCoor(x, y, z);
 			setCoor(old);
 			//update the latest local coordinate into the neicor
 			neicor.put(name, old);
@@ -213,11 +251,11 @@ public class Host {
 		this.coor = coor;
 	}
 
-	public int getAvailability() {
+	public double getAvailability() {
 		return availability;
 	}
 
-	public void setAvailability(int availability) {
+	public void setAvailability(double availability) {
 		this.availability = availability;
 	}
 	public HashMap<String, Double> getRtt() {

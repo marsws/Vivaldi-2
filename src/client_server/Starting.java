@@ -18,8 +18,8 @@ public class Starting {
 		Coordinate acor;
 		String localname;
 		// initialize the host itself and get ready for self updating
-		acor = new Coordinate(0, 0);
-		int avail = 3;
+		acor = new Coordinate(0, 0, 0);
+//		int avail = 3;
 		
 		if(args.length<1){
 			localname = "s1";
@@ -29,7 +29,7 @@ public class Starting {
 			
 		}
 	
-		Host local = new Host(localname, acor, avail);
+		Host local = new Host(localname, acor);
 		
 	
 		// starting the server thread to wait request for info 

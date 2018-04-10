@@ -24,9 +24,15 @@ do
     do
      STR=$STR"${node[$i]}","${average[$i]}"'\n'
     done
+   echo -e $STR > /home/ubuntu/RTT
 
-  echo -e $STR > /home/ubuntu/RTT
+
+   STRR=$STRR"$(mpstat -P ALL  | awk '{print $2 " "  $12}')"
+   echo -e $STRR>> /home/ubuntu/CPU
+#   echo $STRR
+  
   STR=""
+  STRR=""
 	# echo "${node[$i]}" , "${average[$i]}" > /home/ubuntu/RTT
 	#else
         #echo "${node[$i]}" , "${average[$i]}" >> /home/ubuntu/RTT
